@@ -16,7 +16,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        //
+        return User::latest()->paginate(10);
     }
 
     /**
@@ -28,6 +28,12 @@ class UserController extends Controller
     public function store(Request $request)
     {
         // return $request->all();
+        $this->validate($request,[
+            'name' => 'required|string|max:50',
+            'email' => 'required|string|email|max:50|unique:users',
+            'password' => 'required|string|min:6'
+        ]);
+
         return User::create([
             'name' => $request['name'],
             'email' => $request['email'],
