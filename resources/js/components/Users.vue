@@ -7,7 +7,8 @@
                 <h3 class="card-title">Users Table</h3>
 
                 <div class="card-tools">
-                  <button class="btn btn-success" data-toggle="modal" data-target="#addNew">
+                  <!-- <button class="btn btn-success" data-toggle="modal" data-target="#addNew"> -->
+                    <button class="btn btn-success" @click="newModal">
                       <i class="fas fa-user-plus"> New</i></button>
                 </div>
 
@@ -33,7 +34,7 @@
                       <td>{{user.type | upText}}</td>
                       <td>{{user.created_at | myDate}}</td>
                       <td>
-                          <a href="#">
+                          <a href="#" @click="editModal(user)">
                               <i class="fa fa-edit blue"> Edit</i>
                           </a>
                           |
@@ -124,6 +125,15 @@ import { setInterval } from 'timers';
         }
       },
       methods: {
+        editModal(user){
+          this.form.reset();
+          $('#addNew').modal('show');
+          this.form.fill(user);
+        },
+        newModal(){
+          this.form.reset();
+          $('#addNew').modal('show');
+        },
         deleteUser(id){
           Swal.fire({
             title: 'Are you sure?',
