@@ -37,8 +37,8 @@
                               <i class="fa fa-edit blue"> Edit</i>
                           </a>
                           |
-                          <a href="#">
-                              <i class="fa fa-trash red"> Hapus</i>
+                          <a href="#" @click="deleteUser(user.id)">
+                              <i class="fa fa-trash red"> Delete</i>
                           </a>
                       </td>
                     </tr>
@@ -108,6 +108,7 @@
 </template>
 
 <script>
+import { setInterval } from 'timers';
     export default {
       data() {
         return {
@@ -123,19 +124,52 @@
         }
       },
       methods: {
+        deleteUser(id){
+          Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+          }).then((result) => {
+            // send request to the server
+            if (result.value) {
+              this.form.delete('api/user/'+id).then(()=>{
+                
+                  Swal.fire(
+                    'Deleted!',
+                    'Your file has been deleted.',
+                    'success'
+                  )
+                  Fire.$emit('AfterCreate');
+                
+              }).catch(()=>{
+                Swal.fire("Failed!", "There was something wronge", "Warning");
+              });
+            }
+          })
+        },
         loadUsers(){
           axios.get("api/user").then(({ data}) => (this.users = data.data));
         },
         createUser(){
           this.$Progress.start();
-          this.form.post('api/user');
-
-          $('#addNew').modal('hide')
-          toast.fire({
-            type: 'success',
-            title: 'User Created in successfully'
+          this.form.post('api/user')
+          .then(()=>{
+            Fire.$emit('AfterCreate');
+            $('#addNew').modal('hide')
+            toast.fire({
+              type: 'success',
+              title: 'User Created in successfully'
+            })
+            this.$$Progress.finish();
           })
-          this.$$Progress.finish();
+          .catch(()=>{
+
+          })
+          
         }
       },
         // mounted() {
@@ -143,6 +177,10 @@
         // }
         created() {
           this.loadUsers();
+          Fire.$on('AfterCreate',() => {
+            this.loadUsers();
+          });
+          // setInterval(() => this.loadUsers(), 3000);
         }
     }
 </script>
